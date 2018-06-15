@@ -28,6 +28,7 @@ import sklearn.datasets as skds
 from pathlib import Path
 from PyDictionary import PyDictionary
 pydict = PyDictionary()
+import urllib.request as urllib
 
 # Reproducability :D 
 np.random.seed(7)
@@ -45,9 +46,11 @@ keyMashText = csv.reader(keyMashURLResponse.text)
 
 data_words, data_labels = [], []
 
-for row in randomText:
-  data_words.append(row[0])
-  data_labels.append('Random Text')
+with requests.get(randomTextURL).text as randomText:
+  
+  for row in randomText:
+    data_words.append(row[0])
+    data_labels.append('Random Text')
   
 for row in keyMash:
   data_words.append(row[0])
@@ -141,8 +144,8 @@ def percent_gibberish(line):
       
   return gibberish_count / total_count
 
-def determine_mashing(list):
-  # assumes list is gibberish
+def determine_mashing(line):
+  # assumes line is gibberish
   # key set only includes the alphabet, not the other keys on the keyboard because i'm lazy
   common_keys = {"Q":["W","A"],"W":["Q","A","S","D","E"], "E":["W","S","D","F","R"], "R":["E","D","F","G","T"],"T":["R","F","G","H","Y"],
                 "Y":["T","G","H","J","Y"], "U":["Y","H","J","I","K"], "I":["U","J","K","L","O"], "O":["I","K","L","P"],
@@ -154,8 +157,8 @@ def determine_mashing(list):
   mashing = False
   mash_count = 0
   total_count = 0
-  words = line.split()
-  letters = words.list()
+  words = str(line.split())
+  letters = list(words)
 
   for word in words: # I think this might not work because it doesn't move on to another word until it checked the same thing a bunch of times
     if words.index(word) + 3 is not None and words.index(word) - 3 is not None:
@@ -189,3 +192,39 @@ def determine_mashing(list):
     mashing = True
     
   return mashing
+
+# Prompt the user for input for a file, examine the file line by line, and determine
+# 1) whether or not it is gibberish, as well as the percent gibberish,
+# and 2) if it is gibberish, the percent mashed
+
+if __name__ == "__main__":
+  gibberish_count = 0
+  total_count = 0
+  mashing_count = 0
+  total_mashing_count = 0
+  
+  file = input("Enter the full link to the file you wish to examine: ")
+  data = urllib.urlopen(file)
+  for line in data:
+    if determine_gibberish(line):
+        gibberish_count+=1
+        total_count+=1
+    else:
+      total_count+=1
+
+    if determine_mashing(line):
+      mashing_count+=1
+      total_mashing_count+=1
+    else:
+      total_mashing_count+=1
+        
+  calculated_gibberish = gibberish_count / total_count
+  calculated_mashing = mashing_count / total_mashing_count
+  print("Your file is " + calculated_gibberish*100 + "% gibberish")
+    
+  if calculated_gibberish >= 0.75 and calculated_mashing >= 0.75:
+    print("Your file is determined to be gibberish and the result of keyboard mashing")
+  elif calculated_gibberish >= 0.75 and calculated_mashing < 0.75:
+    print("Your file is determined to be gibberish and the result of some other form of random generation -- not keyboard mashing")
+  else:
+    print("Your file is determined to not be gibberish")
