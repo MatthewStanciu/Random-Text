@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1d_3UzZyS-9CWZRxpmzUNY9dODaXlKy2N
 """
 
-!pip install PyDictionary
+#!pip install PyDictionary
 
 """# Explanation
 First we need to install TensorFlow in the machine. Then `import` them.
@@ -20,11 +20,11 @@ import csv
 import pandas as pd
 import numpy as np
 import pickle
-from keras.preprocessing.text import Tokenizer
-from keras.models import Sequential
-from keras.layers import Activation, Dense, Dropout
-from sklearn.preprocessing import LabelBinarizer
-import sklearn.datasets as skds
+#from keras.preprocessing.text import Tokenizer
+#from keras.models import Sequential
+#from keras.layers import Activation, Dense, Dropout
+#from sklearn.preprocessing import LabelBinarizer
+#import sklearn.datasets as skds
 from pathlib import Path
 from PyDictionary import PyDictionary
 pydict = PyDictionary()
